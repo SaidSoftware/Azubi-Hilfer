@@ -1,0 +1,532 @@
+<Window x:Class="AzubiHilfer.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Azubi-Hilfer" Height="860" Width="1300"
+        MinHeight="680" MinWidth="1000"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="Segoe UI">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="255"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ═══ SIDEBAR ═══ -->
+        <Border x:Name="SidebarBorder" Grid.Column="0">
+            <DockPanel>
+                <!-- Logo + Controls -->
+                <Border x:Name="SidebarHeader" DockPanel.Dock="Top" Padding="20,20,20,16"
+                        BorderThickness="0,0,0,1">
+                    <StackPanel>
+                        <TextBlock Text="🎓 Azubi-Hilfer" FontSize="19" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock x:Name="txtSubtitle" FontSize="11" Foreground="#607B9A" Margin="0,3,0,0"/>
+
+                        <!-- Search Bar -->
+                        <Border x:Name="SearchBorder" CornerRadius="8" Margin="0,12,0,8"
+                                BorderThickness="1" Padding="8,0">
+                            <DockPanel>
+                                <TextBlock Text="🔍" FontSize="12" VerticalAlignment="Center" Margin="0,0,5,0"
+                                           Foreground="#607B9A"/>
+                                <TextBox x:Name="tbSearch" Background="Transparent" BorderThickness="0"
+                                         Foreground="#B0C4DE" FontSize="12" Padding="0,7"
+                                         VerticalAlignment="Center"
+                                         TextChanged="TbSearch_TextChanged"/>
+                            </DockPanel>
+                        </Border>
+
+                        <!-- Lang + Dark Mode row -->
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="btnDE" Content="DE" Click="BtnDE_Click"
+                                    Style="{StaticResource LangToggle}" Margin="0,0,4,0"/>
+                            <Button x:Name="btnEN" Content="EN" Click="BtnEN_Click"
+                                    Style="{StaticResource LangToggle}" Margin="0,0,8,0"/>
+                            <Button x:Name="btnDark" Click="BtnDark_Click"
+                                    Style="{StaticResource LangToggle}" Content="🌙" ToolTip="Dark Mode"/>
+                            <Button x:Name="btnExport" Click="BtnExport_Click"
+                                    Style="{StaticResource LangToggle}" Content="📤" Margin="4,0,0,0" ToolTip="Export"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Nav -->
+                <ScrollViewer DockPanel.Dock="Bottom" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="0,10,0,16">
+
+                        <Button x:Name="btnDashboard" Style="{StaticResource SidebarNavItem}" Click="BtnDashboard_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="📊" FontSize="13" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="txtNavDashboard" Text="Dashboard" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <TextBlock x:Name="txtNavFI" Style="{StaticResource SidebarSectionHeader}" Text="FI ANWENDUNGSENTWICKLUNG"/>
+                        <Button x:Name="btnFI" Style="{StaticResource SidebarNavItem}" Click="BtnFI_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="💻" FontSize="13" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="txtFILabel" Text="Aufgaben" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <TextBlock x:Name="txtNavKDM" Style="{StaticResource SidebarSectionHeader}" Text="KAUFMANN DIGITALISIERUNG" Margin="20,12,20,4"/>
+                        <Button x:Name="btnKDM" Style="{StaticResource SidebarNavItem}" Click="BtnKDM_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="📈" FontSize="13" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="txtKDMLabel" Text="Aufgaben" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <TextBlock Style="{StaticResource SidebarSectionHeader}" Text="ABTEILUNGEN" Margin="20,12,20,4"/>
+                        <Button x:Name="btnDepts" Style="{StaticResource SidebarNavItem}" Click="BtnDepts_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🏢" FontSize="13" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="txtDeptsLabel" Text="Übersicht" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <TextBlock Style="{StaticResource SidebarSectionHeader}" Text="DOKUMENTE" Margin="20,12,20,4"/>
+                        <Button x:Name="btnDocs" Style="{StaticResource SidebarNavItem}" Click="BtnDocs_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="📁" FontSize="13" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="txtDocsLabel" Text="Alle Dokumente" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <!-- ═══ CONTENT AREA ═══ -->
+        <Grid Grid.Column="1" x:Name="ContentGrid">
+
+            <!-- SEARCH RESULTS -->
+            <Border x:Name="PanelSearch" Visibility="Collapsed">
+                <DockPanel>
+                    <Border x:Name="SearchHeader" DockPanel.Dock="Top" Padding="36,20,36,16"
+                            BorderThickness="0,0,0,1">
+                        <TextBlock x:Name="txtSearchTitle" FontSize="20" FontWeight="Bold"/>
+                    </Border>
+                    <ScrollViewer Padding="36,16,36,36" VerticalScrollBarVisibility="Auto">
+                        <StackPanel x:Name="SearchResultsContainer"/>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+
+            <!-- DASHBOARD -->
+            <Border x:Name="PanelDashboard" Visibility="Visible">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,36">
+                        <TextBlock x:Name="txtDashTitle" FontSize="26" FontWeight="Bold"/>
+                        <TextBlock x:Name="txtDashSub" FontSize="13" Margin="0,4,0,28"/>
+
+                        <Grid Margin="0,0,0,20">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Border x:Name="StatCard1" Grid.Column="0" Margin="0,0,12,0" Style="{StaticResource Card}"/>
+                            <Border x:Name="StatCard2" Grid.Column="1" Margin="0,0,12,0" Style="{StaticResource Card}"/>
+                            <Border x:Name="StatCard3" Grid.Column="2" Margin="0,0,12,0" Style="{StaticResource Card}"/>
+                            <Border x:Name="StatCard4" Grid.Column="3" Style="{StaticResource Card}"/>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,20">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/><ColumnDefinition Width="290"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0" Margin="0,0,16,0" Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock x:Name="txtProgressTitle" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,16"/>
+                                    <StackPanel x:Name="ProgressBarsContainer"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Column="1" Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock x:Name="txtDiffTitle" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,16"/>
+                                    <StackPanel x:Name="DifficultyContainer"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock x:Name="txtDashDeptTitle" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,14"/>
+                                <WrapPanel x:Name="DashDeptContainer"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- TASK LIST -->
+            <Border x:Name="PanelTaskList" Visibility="Collapsed">
+                <DockPanel>
+                    <!-- Header -->
+                    <Border x:Name="TaskListHeader" DockPanel.Dock="Top" Padding="36,18,36,16" BorderThickness="0,0,0,1">
+                        <StackPanel>
+                            <DockPanel Margin="0,0,0,12">
+                                <Button x:Name="btnAddTask" DockPanel.Dock="Right"
+                                        Style="{StaticResource AccentButton}" Click="BtnAddTask_Click" Padding="16,8">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="+ " FontWeight="Bold"/>
+                                        <TextBlock x:Name="txtAddTask" Text="Aufgabe hinzufügen"/>
+                                    </StackPanel>
+                                </Button>
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Border x:Name="GroupColorBar" Width="4" Height="26" CornerRadius="2" Margin="0,0,12,0"/>
+                                        <TextBlock x:Name="txtGroupTitle" FontSize="22" FontWeight="Bold" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="txtTaskCount" FontSize="12" Margin="16,3,0,0"/>
+                                </StackPanel>
+                            </DockPanel>
+
+                            <!-- Filter Bar -->
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock x:Name="txtFilterLabel" Text="Filter:" FontSize="12" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                <!-- Difficulty filter -->
+                                <ComboBox x:Name="cbFilterDiff" Width="130" FontSize="12" Margin="0,0,8,0"
+                                          SelectionChanged="FilterChanged"/>
+                                <!-- Department filter -->
+                                <ComboBox x:Name="cbFilterDept" Width="150" FontSize="12" Margin="0,0,8,0"
+                                          SelectionChanged="FilterChanged"/>
+                                <!-- Status filter -->
+                                <ComboBox x:Name="cbFilterStatus" Width="120" FontSize="12" Margin="0,0,8,0"
+                                          SelectionChanged="FilterChanged"/>
+                                <!-- Tag filter -->
+                                <ComboBox x:Name="cbFilterTag" Width="130" FontSize="12"
+                                          SelectionChanged="FilterChanged"/>
+                                <Button x:Name="btnResetFilter" Style="{StaticResource GhostButton}"
+                                        Click="BtnResetFilter_Click" Padding="10,4" Margin="8,0,0,0">
+                                    <TextBlock x:Name="txtResetFilter" Text="✕ Reset" FontSize="11"/>
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <ScrollViewer Padding="36,16,36,36" VerticalScrollBarVisibility="Auto">
+                        <StackPanel x:Name="TaskListContainer"/>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+
+            <!-- TASK DETAIL -->
+            <Border x:Name="PanelTaskDetail" Visibility="Collapsed">
+                <DockPanel>
+                    <Border x:Name="DetailHeader" DockPanel.Dock="Top" Padding="36,14,36,14" BorderThickness="0,0,0,1">
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                <Button x:Name="btnEditTask" Style="{StaticResource GhostButton}"
+                                        Click="BtnEditTask_Click" Padding="10,6" Margin="0,0,8,0">
+                                    <TextBlock x:Name="txtEditBtn" Text="✏️ Bearbeiten"/>
+                                </Button>
+                                <Button x:Name="btnDeleteTask" Style="{StaticResource DangerButton}"
+                                        Click="BtnDeleteTask_Click" Padding="10,6">
+                                    <TextBlock x:Name="txtDeleteBtn" Text="🗑 Löschen"/>
+                                </Button>
+                            </StackPanel>
+                            <Button x:Name="btnBack" DockPanel.Dock="Left"
+                                    Style="{StaticResource GhostButton}" Click="BtnBack_Click" Margin="0,0,14,0">
+                                <TextBlock x:Name="txtBack" Text="← Zurück"/>
+                            </Button>
+                            <TextBlock x:Name="txtDetailTitle" FontSize="18" FontWeight="Bold"
+                                       VerticalAlignment="Center" TextWrapping="Wrap"/>
+                        </DockPanel>
+                    </Border>
+                    <ScrollViewer x:Name="DetailScroll" Padding="36,22,36,36" VerticalScrollBarVisibility="Auto">
+                        <StackPanel x:Name="DetailContainer"/>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+
+            <!-- DEPARTMENTS -->
+            <Border x:Name="PanelDepts" Visibility="Collapsed">
+                <DockPanel>
+                    <Border x:Name="DeptsHeader" DockPanel.Dock="Top" Padding="36,20,36,16" BorderThickness="0,0,0,1">
+                        <TextBlock x:Name="txtDeptsTitle" FontSize="22" FontWeight="Bold"/>
+                    </Border>
+                    <ScrollViewer Padding="36,22,36,36" VerticalScrollBarVisibility="Auto">
+                        <WrapPanel x:Name="DeptsContainer"/>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+
+            <!-- DOCUMENTS -->
+            <Border x:Name="PanelDocs" Visibility="Collapsed">
+                <DockPanel>
+                    <Border x:Name="DocsHeader" DockPanel.Dock="Top" Padding="36,20,36,16" BorderThickness="0,0,0,1">
+                        <TextBlock x:Name="txtDocsTitle" FontSize="22" FontWeight="Bold"/>
+                    </Border>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="280"/><ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border x:Name="DocListBorder" Grid.Column="0" BorderThickness="0,0,1,0">
+                            <ScrollViewer Padding="8,12" VerticalScrollBarVisibility="Auto">
+                                <StackPanel x:Name="DocListContainer"/>
+                            </ScrollViewer>
+                        </Border>
+                        <ScrollViewer Grid.Column="1" Padding="36,26,36,36" VerticalScrollBarVisibility="Auto">
+                            <StackPanel x:Name="DocContentContainer"/>
+                        </ScrollViewer>
+                    </Grid>
+                </DockPanel>
+            </Border>
+
+            <!-- ═══ OVERLAY: ADD/EDIT TASK ═══ -->
+            <Border x:Name="OverlayAddTask" Visibility="Collapsed" Background="#AA000000">
+                <Border x:Name="AddTaskCard" CornerRadius="14" Padding="30,28,30,28"
+                        MaxWidth="660" MaxHeight="720"
+                        HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <DockPanel>
+                        <DockPanel DockPanel.Dock="Top" Margin="0,0,0,20">
+                            <Button DockPanel.Dock="Right" Content="✕" Style="{StaticResource GhostButton}"
+                                    Click="BtnCloseOverlay_Click" Padding="8,4"/>
+                            <TextBlock x:Name="txtOverlayTitle" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
+                        </DockPanel>
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="14"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock x:Name="lbTitle" Text="Titel (DE) *" Style="{StaticResource FormLabel}"/>
+                                        <TextBox x:Name="tbTitle" Style="{StaticResource FormInput}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock x:Name="lbTitleEn" Text="Title (EN)" Style="{StaticResource FormLabel}"/>
+                                        <TextBox x:Name="tbTitleEn" Style="{StaticResource FormInput}"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <TextBlock x:Name="lbDesc" Text="Beschreibung" Style="{StaticResource FormLabel}"/>
+                                <TextBox x:Name="tbDesc" Style="{StaticResource FormInput}" Height="68"
+                                         TextWrapping="Wrap" AcceptsReturn="True"
+                                         VerticalScrollBarVisibility="Auto" Margin="0,0,0,12"/>
+
+                                <Grid Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="14"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock x:Name="lbGroup" Text="Gruppe" Style="{StaticResource FormLabel}"/>
+                                        <ComboBox x:Name="cbGroup" Style="{StaticResource FormCombo}">
+                                            <ComboBoxItem Content="FI Anwendungsentwicklung" IsSelected="True"/>
+                                            <ComboBoxItem Content="Kaufmann Digitalisierung"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock x:Name="lbDiff" Text="Schwierigkeitsgrad" Style="{StaticResource FormLabel}"/>
+                                        <ComboBox x:Name="cbDiff" Style="{StaticResource FormCombo}">
+                                            <ComboBoxItem Content="🟢 Anfänger" IsSelected="True"/>
+                                            <ComboBoxItem Content="🟡 Mittel"/>
+                                            <ComboBoxItem Content="🔴 Fortgeschritten"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="14"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock x:Name="lbDept" Text="Abteilung" Style="{StaticResource FormLabel}"/>
+                                        <ComboBox x:Name="cbDept" Style="{StaticResource FormCombo}">
+                                            <ComboBoxItem Content="Support"/>
+                                            <ComboBoxItem Content="Entwicklung" IsSelected="True"/>
+                                            <ComboBoxItem Content="Schnittstelle"/>
+                                            <ComboBoxItem Content="Vertragsdatenbank"/>
+                                            <ComboBoxItem Content="Verwaltung"/>
+                                            <ComboBoxItem Content="Azubi"/>
+                                            <ComboBoxItem Content="Technik"/>
+                                            <ComboBoxItem Content="Vertrieb"/>
+                                            <ComboBoxItem Content="Kundenbetreung"/>
+                                            <ComboBoxItem Content="Report"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock x:Name="lbAuthor" Text="Autor / Azubi Name" Style="{StaticResource FormLabel}"/>
+                                        <TextBox x:Name="tbAuthor" Style="{StaticResource FormInput}"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="14"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock x:Name="lbTags" Text="Tags (kommagetrennt)" Style="{StaticResource FormLabel}"/>
+                                        <TextBox x:Name="tbTags" Style="{StaticResource FormInput}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock x:Name="lbLibs" Text="Bibliotheken / Tools" Style="{StaticResource FormLabel}"/>
+                                        <TextBox x:Name="tbLibs" Style="{StaticResource FormInput}"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <TextBlock x:Name="lbLinks" Text="Links (eine URL pro Zeile)" Style="{StaticResource FormLabel}"/>
+                                <TextBox x:Name="tbLinks" Style="{StaticResource FormInput}"
+                                         Height="52" TextWrapping="Wrap" AcceptsReturn="True"
+                                         VerticalScrollBarVisibility="Auto" Margin="0,0,0,12"/>
+
+                                <!-- Screenshot -->
+                                <TextBlock x:Name="lbScreenshot" Text="Screenshot / Bild" Style="{StaticResource FormLabel}"/>
+                                <DockPanel Margin="0,0,0,20">
+                                    <Button x:Name="btnPickScreenshot" DockPanel.Dock="Right"
+                                            Style="{StaticResource GhostButton}" Click="BtnPickScreenshot_Click"
+                                            Padding="12,7" Margin="8,0,0,0">
+                                        <TextBlock x:Name="txtPickBtn" Text="📁 Bild wählen"/>
+                                    </Button>
+                                    <TextBox x:Name="tbScreenshot" Style="{StaticResource FormInput}" IsReadOnly="True"/>
+                                </DockPanel>
+
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <Button Style="{StaticResource GhostButton}" Click="BtnCloseOverlay_Click"
+                                            Padding="16,8" Margin="0,0,10,0">
+                                        <TextBlock x:Name="txtCancelBtn" Text="Abbrechen"/>
+                                    </Button>
+                                    <Button Style="{StaticResource AccentButton}" Click="BtnSaveTask_Click" Padding="20,8">
+                                        <TextBlock x:Name="txtSaveBtn" Text="✓ Speichern"/>
+                                    </Button>
+                                </StackPanel>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </DockPanel>
+                </Border>
+            </Border>
+
+            <!-- ═══ OVERLAY: ADD STORY ═══ -->
+            <Border x:Name="OverlayStory" Visibility="Collapsed" Background="#AA000000">
+                <Border x:Name="StoryCard" CornerRadius="14" Padding="30,28,30,28"
+                        MaxWidth="660" MaxHeight="740"
+                        HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <DockPanel>
+                        <DockPanel DockPanel.Dock="Top" Margin="0,0,0,20">
+                            <Button DockPanel.Dock="Right" Content="✕" Style="{StaticResource GhostButton}"
+                                    Click="BtnCloseStory_Click" Padding="8,4"/>
+                            <TextBlock x:Name="txtStoryOverlayTitle" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
+                        </DockPanel>
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="14"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Azubi Name" Style="{StaticResource FormLabel}"/>
+                                        <TextBox x:Name="tbStoryAuthor" Style="{StaticResource FormInput}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Jahr" Style="{StaticResource FormLabel}"/>
+                                        <TextBox x:Name="tbStoryYear" Style="{StaticResource FormInput}" Text="2024"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="14"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Titel (DE)" Style="{StaticResource FormLabel}"/>
+                                        <TextBox x:Name="tbStoryTitle" Style="{StaticResource FormInput}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Title (EN)" Style="{StaticResource FormLabel}"/>
+                                        <TextBox x:Name="tbStoryTitleEn" Style="{StaticResource FormInput}"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <TextBlock Text="Beschreibung / Erfahrung (DE)" Style="{StaticResource FormLabel}"/>
+                                <TextBox x:Name="tbStoryContent" Style="{StaticResource FormInput}"
+                                         Height="80" TextWrapping="Wrap" AcceptsReturn="True"
+                                         VerticalScrollBarVisibility="Auto" Margin="0,0,0,12"/>
+
+                                <TextBlock Text="Description / Experience (EN)" Style="{StaticResource FormLabel}"/>
+                                <TextBox x:Name="tbStoryContentEn" Style="{StaticResource FormInput}"
+                                         Height="60" TextWrapping="Wrap" AcceptsReturn="True"
+                                         VerticalScrollBarVisibility="Auto" Margin="0,0,0,14"/>
+
+                                <Border Height="1" Background="#E5E7EB" Margin="0,0,0,14"/>
+
+                                <TextBlock Text="Codebeispiel (optional)" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,10"/>
+
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="14"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Code-Titel" Style="{StaticResource FormLabel}"/>
+                                        <TextBox x:Name="tbCodeTitle" Style="{StaticResource FormInput}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Sprache" Style="{StaticResource FormLabel}"/>
+                                        <ComboBox x:Name="cbCodeLang" Style="{StaticResource FormCombo}">
+                                            <ComboBoxItem Content="csharp" IsSelected="True"/>
+                                            <ComboBoxItem Content="delphi"/>
+                                            <ComboBoxItem Content="sql"/>
+                                            <ComboBoxItem Content="xml"/>
+                                            <ComboBoxItem Content="python"/>
+                                            <ComboBoxItem Content="javascript"/>
+                                            <ComboBoxItem Content="text"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                </Grid>
+
+                                <TextBlock Text="Code" Style="{StaticResource FormLabel}"/>
+                                <TextBox x:Name="tbCode" Style="{StaticResource FormInput}"
+                                         FontFamily="Cascadia Code,Consolas,Courier New" FontSize="12"
+                                         Height="100" TextWrapping="NoWrap" AcceptsReturn="True"
+                                         HorizontalScrollBarVisibility="Auto"
+                                         VerticalScrollBarVisibility="Auto" Margin="0,0,0,10"/>
+
+                                <TextBlock Text="Erklärung (DE)" Style="{StaticResource FormLabel}"/>
+                                <TextBox x:Name="tbCodeExpl" Style="{StaticResource FormInput}"
+                                         Height="52" TextWrapping="Wrap" AcceptsReturn="True"
+                                         VerticalScrollBarVisibility="Auto" Margin="0,0,0,20"/>
+
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <Button Style="{StaticResource GhostButton}" Click="BtnCloseStory_Click"
+                                            Padding="16,8" Margin="0,0,10,0">
+                                        <TextBlock Text="Abbrechen"/>
+                                    </Button>
+                                    <Button Style="{StaticResource AccentButton}" Click="BtnSaveStory_Click" Padding="20,8">
+                                        <TextBlock Text="✓ Story speichern"/>
+                                    </Button>
+                                </StackPanel>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </DockPanel>
+                </Border>
+            </Border>
+
+            <!-- ═══ OVERLAY: EXPORT ═══ -->
+            <Border x:Name="OverlayExport" Visibility="Collapsed" Background="#AA000000">
+                <Border x:Name="ExportCard" CornerRadius="14" Padding="30,28,30,28"
+                        MaxWidth="460" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <StackPanel>
+                        <DockPanel Margin="0,0,0,20">
+                            <Button DockPanel.Dock="Right" Content="✕" Style="{StaticResource GhostButton}"
+                                    Click="BtnCloseExport_Click" Padding="8,4"/>
+                            <TextBlock x:Name="txtExportTitle" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
+                        </DockPanel>
+
+                        <TextBlock x:Name="txtExportWhat" FontSize="13" Margin="0,0,0,16"/>
+
+                        <Button Style="{StaticResource AccentButton}" Click="BtnExportPdf_Click"
+                                Padding="0,12" Margin="0,0,0,10" HorizontalContentAlignment="Left">
+                            <StackPanel Orientation="Horizontal" Margin="16,0">
+                                <TextBlock Text="📄" FontSize="18" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                <StackPanel>
+                                    <TextBlock x:Name="txtExportPdf" Text="Als PDF exportieren" FontWeight="SemiBold" FontSize="14"/>
+                                    <TextBlock x:Name="txtExportPdfSub" Text="Alle Aufgaben als PDF-Dokument" FontSize="11" Opacity="0.8"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource GhostButton}" Click="BtnExportCsv_Click"
+                                Padding="0,12" Margin="0,0,0,20" HorizontalContentAlignment="Left">
+                            <StackPanel Orientation="Horizontal" Margin="16,0">
+                                <TextBlock Text="📊" FontSize="18" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                <StackPanel>
+                                    <TextBlock x:Name="txtExportCsv" Text="Als CSV exportieren" FontWeight="SemiBold" FontSize="14"/>
+                                    <TextBlock x:Name="txtExportCsvSub" Text="Für Excel, Calc etc." FontSize="11" Opacity="0.7"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource GhostButton}" Click="BtnCloseExport_Click" Padding="16,8" HorizontalAlignment="Right">
+                            <TextBlock x:Name="txtExportClose" Text="Schließen"/>
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </Border>
+
+        </Grid>
+    </Grid>
+</Window>
